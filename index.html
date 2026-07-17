@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MDOAT: Milwaukee Density Opportunity Analysis Tool</title>
+
+  <!-- ArcGIS JS SDK -->
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.29/"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header id="app-header">
+    <h1>Milwaukee Density Opportunity Analysis Tool</h1>
+    <nav id="main-nav">
+      <button class="nav-btn active" data-view="map">Map</button>
+      <button class="nav-btn" data-view="query">Query</button>
+      <button class="nav-btn" data-view="catalog">Catalog</button>
+      <button class="nav-btn" data-view="about">About</button>
+    </nav>
+  </header>
+
+  <!-- Views -->
+  <main id="app-main">
+
+    <!-- Map View -->
+    <div id="view-map" class="app-view active">
+      <div id="map-container"></div>
+    </div>
+
+    <!-- Query View -->
+    <div id="view-query" class="app-view">
+      <div id="query-panel">
+        <h2>Query Parcels</h2>
+        <p class="coming-soon">Query panel — coming in Phase 4.</p>
+      </div>
+    </div>
+
+    <!-- Catalog View -->
+    <div id="view-catalog" class="app-view">
+      <div id="catalog-panel">
+        <h2>Tagged Opportunities</h2>
+        <p class="coming-soon">Catalog — coming in Phase 5.</p>
+      </div>
+    </div>
+
+    <!-- About View -->
+    <div id="view-about" class="app-view">
+      <div id="about-panel">
+        <h2>About MDOAT</h2>
+        <p>Milwaukee Density Opportunity Analysis Tool (MDOAT) is a web-based GIS application identifying parcels in the City of Milwaukee where current zoning constrains higher-density development. Built for municipal planning staff, housing policy analysts, and urban development advocates.</p>
+        <h3>Data Sources</h3>
+        <ul>
+          <li>Parcels + MPROP — City of Milwaukee Open Data Portal (nightly)</li>
+          <li>Zoning Districts — City of Milwaukee (nightly)</li>
+          <li>Vacant Lots — City of Milwaukee (nightly)</li>
+          <li>Neighborhoods — City of Milwaukee (nightly)</li>
+          <li>Opportunity Zones — City of Milwaukee (nightly)</li>
+          <li>Tax Incremental Districts — City of Milwaukee (nightly)</li>
+          <li>Redevelopment Plans — City of Milwaukee (nightly)</li>
+          <li>User Annotations — AGOL hosted feature layer (real-time)</li>
+        </ul>
+        <p class="author">Author: Noah Kirchner | Geography 576 | University of Wisconsin–Madison</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Main JS -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>
