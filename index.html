@@ -25,6 +25,9 @@
     </nav>
   </header>
 
+  <!-- Flag This Site — fixed map button, shown when parcel selected -->
+  <button id="flag-btn" class="flag-btn hidden">⚑ Flag This Site</button>
+
   <!-- Views -->
   <main id="app-main">
 
@@ -70,6 +73,35 @@
     </div>
 
   </main>
+
+  <!-- Annotation Modal -->
+  <div id="annotation-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Flag Site for Investigation</h3>
+        <button id="modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-parcel-label" class="modal-parcel-label"></p>
+        <label for="priority-select">Priority Tier</label>
+        <select id="priority-select">
+          <option value="">— Select —</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+        <label for="notes-input">Notes</label>
+        <textarea id="notes-input" rows="4" placeholder="Describe site conditions, ownership considerations, policy barriers..."></textarea>
+        <label for="submitter-input">Your Name</label>
+        <input type="text" id="submitter-input" placeholder="Optional">
+      </div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn-secondary">Cancel</button>
+        <button id="modal-submit" class="btn-primary">Submit</button>
+      </div>
+      <p id="modal-status" class="modal-status"></p>
+    </div>
+  </div>
 
   <!-- Main JS -->
   <script src="js/main.js"></script>

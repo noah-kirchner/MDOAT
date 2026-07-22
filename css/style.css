@@ -21,52 +21,85 @@ html, body {
 /* --- Layout --- */
 #app-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   background: #1a3a5c;
   color: #fff;
-  padding: 0 1.25rem;
-  height: 52px;
+  padding: 0.6rem 1.5rem 0;
+  height: 72px;
   flex-shrink: 0;
   z-index: 100;
 }
 
 #app-header h1 {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  margin-bottom: 0.35rem;
 }
 
 #app-main {
-  height: calc(100vh - 52px);
+  height: calc(100vh - 72px);
   position: relative;
 }
 
 /* --- Nav --- */
 #main-nav {
   display: flex;
-  gap: 0.25rem;
+  gap: 0;
 }
 
 .nav-btn {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.35);
-  color: #fff;
-  padding: 0.3rem 0.85rem;
-  border-radius: 3px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: rgba(255,255,255,0.7);
+  padding: 0.3rem 1.1rem;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.15s, border-color 0.15s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: 0;
 }
 
 .nav-btn:hover {
-  background: rgba(255,255,255,0.15);
+  color: #fff;
 }
 
 .nav-btn.active {
-  background: #2e6da4;
-  border-color: #2e6da4;
+  color: #fff;
+  border-bottom: 3px solid #5ba3d9;
+}
+
+/* --- Flag This Site button --- */
+.flag-btn {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1.6rem;
+  border-radius: 3px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.28);
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+
+.flag-btn:hover {
+  background: #a93226;
+  transform: translateX(-50%) translateY(-1px);
+}
+
+.flag-btn.hidden {
+  display: none;
 }
 
 /* --- Views --- */
@@ -143,26 +176,162 @@ html, body {
   font-size: 0.9rem;
 }
 
-/* --- Mobile --- */
+/* --- Modal ------------------------------------------------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 5px;
+  width: 420px;
+  max-width: 94vw;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1a3a5c;
+  color: #fff;
+  padding: 0.75rem 1rem;
+}
+
+.modal-header h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 0.2rem;
+}
+
+.modal-parcel-label {
+  font-size: 0.82rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.modal-body {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.modal-body label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0.4rem;
+}
+
+.modal-body select,
+.modal-body textarea,
+.modal-body input[type="text"] {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #222;
+  resize: vertical;
+}
+
+.modal-body select:focus,
+.modal-body textarea:focus,
+.modal-body input[type="text"]:focus {
+  outline: none;
+  border-color: #2e6da4;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #eee;
+}
+
+.btn-primary {
+  background: #2e6da4;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: #1a3a5c;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 0.4rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.modal-status {
+  font-size: 0.82rem;
+  padding: 0 1.25rem 0.75rem;
+  min-height: 1.2rem;
+}
+
 @media (max-width: 600px) {
   #app-header {
-    flex-direction: column;
     height: auto;
-    padding: 0.6rem 1rem;
-    gap: 0.5rem;
+    padding: 0.5rem 1rem 0;
   }
 
   #app-header h1 {
-    font-size: 0.88rem;
+    font-size: 0.95rem;
   }
 
   .nav-btn {
-    padding: 0.25rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.82rem;
   }
 
   #app-main {
-    height: calc(100vh - 90px);
+    height: calc(100vh - 80px);
+  }
+
+  .flag-btn {
+    bottom: 1.5rem;
+    font-size: 0.9rem;
+    padding: 0.55rem 1.2rem;
   }
 
   #query-panel,
