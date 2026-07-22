@@ -384,4 +384,198 @@ require([
     });
   });
 
+  /* ============================================================
+     PHASE 4 — Query Panel
+     ============================================================ */
+
+  // Land use group code → label map
+  const LAND_USE_LABELS = {
+    2: "Residential — Single Family",
+    3: "Residential — Multi Family",
+    4: "Commercial",
+    7: "Industrial",
+    8: "Surface Parking / Transportation",
+    9: "Vacant Land"
+  };
+
+  /* -- Populate neighborhood dropdown from layer ------------- */
+  parcelLayer.load().then(() => {
+    const query = parcelLayer.createQuery();
+    query.outFields = ["NEIGHBORHOOD"];
+    query.returnDistinctValues = true;
+    query.returnGeometry = false;
+    query.orderByFields = ["NEIGHBORHOOD ASC"];
+    query.where = "NEIGHBORHOOD IS NOT NULL AND NEIGHBORHOOD <> ''";
+
+    return parcelLayer.queryFeatures(query);
+  }).then(result => {
+    const select = document.getElementById("q-neighborhood");
+    result.features.forEach(f => {
+      const val = f.attributes.NEIGHBORHOOD;
+      if (val) {
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+      }
+    });
+  }).catch(err => console.warn("Neighborhood load error:", err));
+
+  /* -- Run query --------------------------------------------- */
+  document.getElementById("query-run").addEventListener("click", runQuery);
+  document.getElementById("query-reset").addEventListener("click", resetQuery);
+
+  function resetQuery() {
+    document.getElementById("q-parcel").value = "";
+    document.getElementById("q-neighborhood").value = "";
+    document.getElementById("q-zoning").value = "";
+    document.getElementById("q-landuse").value = "";
+    document.querySelectorAll(".query-toggles input[type=checkbox]")
+      .forEach(cb => cb.checked = false);
+    document.getElementById("query-tbody").innerHTML = "";
+    document.getElementById("query-result-count").textContent = "";
+    document.getElementById("query-export").classList.add("hidden");
+    document.getElementById("query-msg").textContent =
+      "Configure filters above and click Run Query.";
+    document.getElementById("query-msg").classList.remove("hidden");
+    document.getElementById("query-table-wrap").style.display = "none";
+  }
+
+  // Hide table on load
+  document.getElementById("query-table-wrap").style.display = "none";
+
+  function runQuery() {
+    const parcelInput    = document.getElementById("q-parcel").value.trim();
+    const neighborhood   = document.getElementById("q-neighborhood").value;
+    const zoningInput    = document.getElementById("q-zoning").value.trim().toUpperCase();
+    const landUse        = document.getElementById("q-landuse").value;
+    const togVacant      = document.getElementById("tog-vacant").checked;
+    const togTaxDelq     = document.getElementById("tog-taxdelq").checked;
+
+    // Build WHERE clause from attribute filters
+    const clauses = [];
+
+    if (parcelInput) {
+      // Try as TAXKEY first, then partial address match
+      if (/^\d{10}$/.test(parcelInput)) {
+        clauses.push(`TAXKEY = '${parcelInput}'`);
+      } else {
+        const escaped = parcelInput.replace(/'/g, "''").toUpperCase();
+        clauses.push(`UPPER(STREET) LIKE '%${escaped}%'`);
+      }
+    }
+
+    if (neighborhood) {
+      clauses.push(`NEIGHBORHOOD = '${neighborhood}'`);
+    }
+
+    if (zoningInput) {
+      clauses.push(`UPPER(ZONING) LIKE '${zoningInput}%'`);
+    }
+
+    if (landUse) {
+      clauses.push(`LAND_USE_GP = ${landUse}`);
+    }
+
+    if (togVacant) {
+      // Vacant buildings: RAZE_STATUS > 0 or BI_VIOL is not null
+      clauses.push(`(RAZE_STATUS > 0 OR BI_VIOL IS NOT NULL)`);
+    }
+
+    if (togTaxDelq) {
+      clauses.push(`TAX_DELQ > 0`);
+    }
+
+    const where = clauses.length > 0 ? clauses.join(" AND ") : "1=1";
+
+    const msg = document.getElementById("query-msg");
+    msg.textContent = "Running query…";
+    msg.classList.remove("hidden");
+    document.getElementById("query-table-wrap").style.display = "none";
+    document.getElementById("query-result-count").textContent = "";
+    document.getElementById("query-export").classList.add("hidden");
+
+    const q = parcelLayer.createQuery();
+    q.where = where;
+    q.outFields = [
+      "TAXKEY", "HOUSE_NR_LO", "STREET", "STTYPE",
+      "ZONING", "LAND_USE_GP",
+      "C_A_LAND", "C_A_IMPRV",
+      "YR_BUILT", "TAX_DELQ", "OWNER_NAME_1"
+    ];
+    q.returnGeometry = false;
+    q.num = 500; // cap at 500 results
+
+    parcelLayer.queryFeatures(q).then(result => {
+      const features = result.features;
+
+      if (features.length === 0) {
+        msg.textContent = "No parcels matched your query. Try broadening your filters.";
+        return;
+      }
+
+      // Build table
+      const tbody = document.getElementById("query-tbody");
+      tbody.innerHTML = "";
+
+      features.forEach(f => {
+        const a = f.attributes;
+        const addrParts = [a.HOUSE_NR_LO, a.STREET, a.STTYPE].filter(Boolean);
+        const addr = addrParts.length > 0 ? addrParts.join(" ") : "—";
+        const luLabel = LAND_USE_LABELS[a.LAND_USE_GP] || a.LAND_USE_GP || "—";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${addr}</td>
+          <td>${a.TAXKEY || "—"}</td>
+          <td>${a.ZONING || "—"}</td>
+          <td>${luLabel}</td>
+          <td>${a.C_A_LAND ? "$" + Number(a.C_A_LAND).toLocaleString() : "—"}</td>
+          <td>${a.C_A_IMPRV ? "$" + Number(a.C_A_IMPRV).toLocaleString() : "—"}</td>
+          <td>${a.YR_BUILT || "—"}</td>
+          <td>${a.TAX_DELQ || "0"}</td>
+          <td>${a.OWNER_NAME_1 || "—"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const capped = features.length === 500;
+      document.getElementById("query-result-count").textContent =
+        `${features.length}${capped ? "+" : ""} parcel${features.length !== 1 ? "s" : ""} found${capped ? " (capped at 500 — refine filters for more precision)" : ""}`;
+
+      msg.classList.add("hidden");
+      document.getElementById("query-table-wrap").style.display = "block";
+      document.getElementById("query-export").classList.remove("hidden");
+
+    }).catch(err => {
+      msg.textContent = "Query failed. Check your filters and try again.";
+      console.error("Query error:", err);
+    });
+  }
+
+  /* -- Export CSV ------------------------------------------- */
+  document.getElementById("query-export").addEventListener("click", () => {
+    const rows = document.querySelectorAll("#query-tbody tr");
+    if (!rows.length) return;
+
+    const headers = ["Address","TAXKEY","Zoning","Land Use Group",
+                     "Land Value","Improvement Value","Yr Built",
+                     "Tax Delinquent (yrs)","Owner"];
+
+    const lines = [headers.join(",")];
+    rows.forEach(row => {
+      const cells = Array.from(row.querySelectorAll("td"))
+        .map(td => `"${td.textContent.replace(/"/g, '""')}"`);
+      lines.push(cells.join(","));
+    });
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "MDOAT_query_results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
 }); // end require

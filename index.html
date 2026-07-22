@@ -39,8 +39,91 @@
     <!-- Query View -->
     <div id="view-query" class="app-view">
       <div id="query-panel">
-        <h2>Query Parcels</h2>
-        <p class="coming-soon">Query panel — coming in Phase 4.</p>
+
+        <div class="query-header">
+          <h2>Query Parcels</h2>
+          <button id="query-reset" class="btn-secondary">Reset</button>
+        </div>
+
+        <!-- Search row -->
+        <div class="query-search-row">
+          <div class="query-search-group">
+            <label for="q-parcel">Parcel / Address</label>
+            <input type="text" id="q-parcel" placeholder="e.g. 123 N Water St or TAXKEY">
+          </div>
+          <div class="query-search-group">
+            <label for="q-neighborhood">Neighborhood</label>
+            <select id="q-neighborhood">
+              <option value="">— All —</option>
+            </select>
+          </div>
+          <div class="query-search-group">
+            <label for="q-zoning">Zoning Code</label>
+            <input type="text" id="q-zoning" placeholder="e.g. RS4, C9D">
+          </div>
+          <div class="query-search-group">
+            <label for="q-landuse">Land Use Group</label>
+            <select id="q-landuse">
+              <option value="">— All —</option>
+              <option value="8">Surface Parking / Transportation</option>
+              <option value="9">Vacant Land</option>
+              <option value="2">Residential — Single Family</option>
+              <option value="3">Residential — Multi Family</option>
+              <option value="4">Commercial</option>
+              <option value="7">Industrial</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Overlay toggles -->
+        <div class="query-toggles">
+          <span class="toggle-label">Filter by overlay:</span>
+          <label class="toggle-chip">
+            <input type="checkbox" id="tog-vacant"> Vacant Buildings
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="tog-oz"> Opportunity Zone
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="tog-tid"> TID
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="tog-reddev"> Redevelopment Plan
+          </label>
+          <label class="toggle-chip">
+            <input type="checkbox" id="tog-taxdelq"> Tax Delinquent
+          </label>
+        </div>
+
+        <button id="query-run" class="btn-primary query-run-btn">Run Query</button>
+
+        <!-- Results -->
+        <div id="query-results-wrap">
+          <div class="query-results-header">
+            <span id="query-result-count" class="result-count"></span>
+            <button id="query-export" class="btn-secondary btn-sm hidden">Export CSV</button>
+          </div>
+          <div id="query-table-wrap">
+            <table id="query-table">
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>TAXKEY</th>
+                  <th>Zoning</th>
+                  <th>Land Use Group</th>
+                  <th>Land Value</th>
+                  <th>Improvement Value</th>
+                  <th>Yr Built</th>
+                  <th>Tax Delinquent (yrs)</th>
+                  <th>Owner</th>
+                </tr>
+              </thead>
+              <tbody id="query-tbody"></tbody>
+            </table>
+          </div>
+          <p id="query-msg" class="query-msg">Configure filters above and click Run Query.</p>
+        </div>
+
       </div>
     </div>
 
